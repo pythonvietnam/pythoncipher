@@ -1,0 +1,23 @@
+﻿# Mã hóa Triple DES
+* Người thực hiện: Lại Văn Huân
+
+#Lý thuyết
+**Triple DES là gì?
+  -Triple DES là một biến thể của DES, được ra đời sau khi mã hóa DES không còn an toàn từ năm 1990
+  -Hoạt động của Triple DES thực chất vẫn dựa trên thuật toán DES, thay vì chỉ mã hóa một lần thì Triple DES đã thực
+hiện 3 lần gồm mã hóa và giải mã của thuật toán DES
+**Triple DES hoạt động dựa vào 3 bước:
+	-Sinh khóa
+	-Mã hóa
+	-Giải mã
+[+]Sinh khóa:
+	-Khóa chính đưa vào sẽ có độ dài 64*3 bits => chia thành 3 khóa con là key1, key2, key3
+	-Các nhóm khóa con 48 bits được sinh ra từ key1, key2, key3 dựa trên thuật toán sinh khóa của DES
+[+]Mã hóa:
+	-Quá trình mã hóa là tập hợp 3 bước liên tục của thuật toán DES:
+	   +Mã hóa với key1
+	   +Giải mã với key2
+	   +Mã hóa với key3
+[+]Giải mã:
+	-Đảo ngược quá trình mã hóa ta sẽ được chuỗi sau giải mã. 
+

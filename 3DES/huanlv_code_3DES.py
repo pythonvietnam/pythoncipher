@@ -249,7 +249,6 @@ def applyIp1(text):
 	return cipher
 #encrypt by des
 def encryptDes(message,key):
-	message = textToHex(message)
 	key = textToHex(key)
 	result=""
 	list64bits = textwrap.wrap(message,16)
@@ -299,14 +298,27 @@ def decryptDes(message,key):
 			L = newL
 		text = applyIp1(R+L)
 		text = binToHex(text)
-		result += hexToText(text)
+		#result += hexToText(text)
+		result += text
 	return result
-
+def encrypt3Des(message,key):
+	message = textToHex(message)
+	listKey = textwrap.wrap(key,8)
+	temp1 = encryptDes(message,listKey[0])
+	temp2 = decryptDes(temp1,listKey[1])
+	temp3 = encryptDes(temp2,listKey[2])
+	return temp3
+def decrypt3Des(message,key):
+	listKey = textwrap.wrap(key,8)
+	temp1 = decryptDes(message,listKey[2])
+	temp2 = encryptDes(temp1,listKey[1])
+	temp3 = decryptDes(temp2,listKey[0])
+	return hexToText(temp3)
 
 """TEST"""
 message = 'xin chao cac ban'
-key ='hello may cung'
-ciphertext = encryptDes(message,key)
+key ='12345678abcdefgh12345678'
+ciphertext = encrypt3Des(message,key)
 print(ciphertext)
-text = decryptDes(ciphertext,key)
+text = decrypt3Des(ciphertext,key)
 print(text)
