@@ -1,5 +1,12 @@
-#Some usage tables for DES algorithm
-#Initial permut made on the key
+"""
+	Hướng dẫn cài đặt thuật toán:
+		+ Sử dụng ngôn ngữ python để chạy mã code (version 3.7)
+		+ Sau khi tải về mở powershell/termiral tại thư mục chứ file mã code
+		+ Chạy lệnh " python huanlv_code_3DES.py " để quan sát
+"""
+
+# Một số bảng cần dùng cho thuật toán 3DES
+# Bảng hoán vị pc-1
 pc1 = (
 	57, 49, 41, 33, 25, 17, 9,
 	1, 58, 50, 42, 34, 26, 18,
@@ -10,7 +17,7 @@ pc1 = (
 	14, 6, 61, 53, 45, 37, 29,
 	21, 13, 5, 28, 20, 12, 4
 	)
-#Permut applied on shifted key to get Ki+1
+# Bảng hoán vị pc-2
 pc2 = (
 	14, 17, 11, 24, 1, 5, 3,
 	28, 15, 6, 21, 10, 23, 19,
@@ -20,7 +27,7 @@ pc2 = (
 	48, 44, 49, 39, 56, 34, 53,
 	46, 42, 50, 36, 29, 32
 	)
-#Initial permut matrix for the datas
+# Bảng hoán vị đầu
 ip = (
 	58, 50, 42, 34, 26, 18, 10, 2,
 	60, 52, 44, 36, 28, 20, 12, 4,
@@ -31,7 +38,7 @@ ip = (
 	61, 53, 45, 37, 29, 21, 13, 5,
 	63, 55, 47, 39, 31, 23, 15, 7
 	)
-#Final permut for datas after the 16 rounds
+# Bảng hoán vị sau cùng
 ip1 = (
 	40, 8, 48, 16, 56, 24, 64, 32,
 	39, 7, 47, 15, 55, 23, 63, 31,
@@ -42,7 +49,7 @@ ip1 = (
 	34, 2, 42, 10, 50, 18, 58, 26,
 	33, 1, 41, 9, 49, 17, 57, 25
 	)
-#Expand matrix to get a 48bits matrix of datas to apply the xor with Ki
+# Bảng hoán vị mở rộng
 e =  (
 	32, 1, 2, 3, 4, 5,
 	4, 5, 6, 7, 8, 9,
@@ -53,6 +60,7 @@ e =  (
 	24, 25, 26, 27, 28, 29,
 	28, 29, 30, 31, 32, 1
 	)
+# Các bảng s-Box
 box = [
 # Box-1
 [
@@ -121,38 +129,38 @@ box = [
 ]
 
 ]
-#Permut made after each SBox substitution for each round
+# Bảng hoán vị P
 p = (
 	16, 7, 20, 21, 29, 12, 28, 17,
 	1, 15, 23, 26, 5, 18, 31, 10,
 	2, 8, 24, 14, 32, 27, 3, 9,
 	19, 13, 30, 6, 22, 11, 4, 25
 	)
-#Matrix that determine the shift for each round of keys
+# Bảng dịch chuyển bit
 rk = (1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1)
 
-#This function take input are permutation table and key 64 bit and return key 56 bit
+# Hàm tạo ra key 56 bits từ key 64 bits và bảng hoán vị pc1
 def applyPc1(key64bits):
 	key56bits = ""
 	for i in pc1:
 		key56bits += key64bits[i-1]
 	return key56bits
-#This function will cut key 56 bits to 2 keys 28 bits
+# Hàm cắt key 56 bits thành 2 key 28 bits
 def cutHaftKey56bits(key56bits):
 	leftKey = key56bits[:28]
 	rightKey = key56bits[28:]
 	return leftKey,rightKey
-#This function will shift left bit by number of bits
+# Hàm dịch bit
 def leftShift(bits,numBits):
 	result = bits[numBits:]+bits[:numBits]
 	return result
-#This function tacke input are key 56 bits and compression table and return key 48 bits
+# Hàm tạo key 48 bits từ key 56 bits và bảng pc2
 def applyPc2(key56bits):
 	key48bits = ""
 	for i in pc2:
 		key48bits += key56bits[i-1]
 	return key48bits
-#This function will return 16 keys
+# Hàm tạo key (sẽ tạo ra 16 key)
 def generateKeys(key64bits):
 	roundKeys = []
 	pc1Out = applyPc1(key64bits)
@@ -171,24 +179,18 @@ def XOR(bits1,bits2):
 		else:
 			xorResult += '1'
 	return xorResult
-#This function take input string 32 bits and return string 48 bits
+# hàm nâng độ dài key từ 32 bit len 48 bit
 def applyExpansion(bits32):
 	bits48 = ""
 	for i in e:
 		bits48 += bits32[i-1]
 	return bits48
-#This function cut strign 48 bits to 6 bits
+# Hàm cắt key 48 bít thành các dãy 6 bits
 import textwrap
 def cutTo6bits(str48bits):
 	result = textwrap.wrap(str48bits,6)
 	return result
-#Some functions to support
-def binToDec(bina):
-	decimal = int(bina,2)
-	return decimal
-def decToBin(deci):
-	bin4bits = bin(deci)[2:].zfill(4)
-	return bin4bits
+# Một số hàm hỗ trợ
 def getFirstLastBit(bits6):
 	return bits6[0]+bits6[-1]
 def getMiddleBit(bits6):
@@ -199,13 +201,13 @@ def boxLookup(boxCount,firstLast,middle):
 
 	value = box[boxCount][dFirstLast][dMiddle]
 	return decToBin(value)
-#This function will return string 32 bits
+# Sử dụng bảng hoán vị p để hoán vị khối 32 bits(Khối L và R)
 def applyP(s32bits):
 	result = ""
 	for i in p:
 		result += s32bits[i-1]
 	return result
-#This is tha F function
+# HÀM F
 def functionF(pre32bits,key48bits):
 	result = ""
 	expanded_left_half = applyExpansion(pre32bits)
@@ -218,7 +220,13 @@ def functionF(pre32bits,key48bits):
 		result += sboxvalue
 	final32bits = applyP(result)	
 	return final32bits
-#Some functions convert
+#Một số hàm chuyển đổi giữa các kiểu dữ liệu
+def binToDec(bina):
+	decimal = int(bina,2)
+	return decimal
+def decToBin(deci):
+	bin4bits = bin(deci)[2:].zfill(4)
+	return bin4bits
 def textToHex(text):
 	return (text.encode("UTF-8")).hex()
 def hexToText(hexText):
@@ -234,7 +242,7 @@ def binToHex(text):
 	for i in range(0,len(text),4):
 		result += lookup[text[i]+text[i+1]+text[i+2]+text[i+3]]
 	return result
-#Use initial permutation table
+#Sử dụng bảng hoán vị Ip
 def applyIp(plaintext):
 	permutated = ""
 	for i in ip:
@@ -247,24 +255,24 @@ def applyIp1(text):
 	for index in ip1:
 		cipher += text[int(index)-1]
 	return cipher
-#encrypt by des
+"""MÃ HÓA VÀ GIẢI MÃ THEO THUẬT TOÁN DES"""
 def encryptDes(message,key):
 	key = textToHex(key)
 	result=""
 	list64bits = textwrap.wrap(message,16)
 	for item in list64bits:
 		cipher = ""
-		# Convert hex digits to binary
+		# Chuyển key và message cần mã háo sang dạng nhị phân
 		plaintext_bits = hexToBin(item)
 		key_bits = hexToBin(key)
-		# Generate rounds key
+		# Tạo key cho 16 vòng lặp
 		roundkeys = generateKeys(key_bits)
 		
-		## initial permutation
+		# Áp dụng bảng hoán vị Ip
 		p_plaintext = applyIp(plaintext_bits)
-		## split in tow half
+		## Chia p_plaintext thành 2 nửa trái và phải
 		L,R = spliHalf(p_plaintext)
-		## start rounds
+		## Mã hóa
 		for round in range(16):
 			newR = XOR(L,functionF(R, roundkeys[round]))
 			newL = R
@@ -280,17 +288,17 @@ def decryptDes(message,key):
 	key = textToHex(key)
 	for item in list64bits:
 		text = ""
-		# Convert hex digits to binary
+		# Chuyển key và message cần mã háo sang dạng nhị phân
 		plaintext_bits = hexToBin(item)
 		key_bits = hexToBin(key)
-		# Generate rounds key
+		# Tạo key cho 16 vòng lặp
 		roundkeys = generateKeys(key_bits)
 		
-		## initial permutation
+		# Áp dụng bảng hoán vị Ip
 		p_plaintext = applyIp(plaintext_bits)
-		## split in tow half
+		## Chia p_plaintext thành 2 nửa trái và phải
 		L,R = spliHalf(p_plaintext)
-		## start rounds
+		## Giải mã
 		for round in range(16):
 			newR = XOR(L,functionF(R, roundkeys[15-round]))
 			newL = R
@@ -301,6 +309,7 @@ def decryptDes(message,key):
 		#result += hexToText(text)
 		result += text
 	return result
+"""MÃ HÓA VÀ GIẢI MÃ THEO THUẬT TOÁN 3DES"""
 def encrypt3Des(message,key):
 	message = textToHex(message)
 	listKey = textwrap.wrap(key,8)
@@ -316,9 +325,21 @@ def decrypt3Des(message,key):
 	return hexToText(temp3)
 
 """TEST"""
-message = 'xin chao cac ban'
-key ='12345678abcdefgh12345678'
-ciphertext = encrypt3Des(message,key)
-print(ciphertext)
-text = decrypt3Des(ciphertext,key)
-print(text)
+check = True
+while check:
+	print("""Enter your chose:\n\t1. Encode\n\t2. Decode\n\t3. Exit""")
+	chose = input("Your chose is: ")
+	if chose == '1':
+		key = input("[+]Enter your key: ")
+		text = input("[+]The text you want encode: ")
+		ciphertext = encrypt3Des(text,key)
+		print("*The text after encode: ",ciphertext+"\n"+"*"*35)
+	elif chose == '2':
+		key = input("[+]Enter your key: ")
+		text = input("[+]The text you want decode: ")
+		plaintext = decrypt3Des(text,key)
+		print("*The text after decode: ",plaintext+"\n"+"*"*35)
+	elif chose == '3':
+		check = False
+	else:
+		print("ERROR! You must chose 1,2 or 3.\n"+"*"*35)
